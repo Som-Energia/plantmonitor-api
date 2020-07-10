@@ -1,0 +1,541 @@
+swagger: "2.0"
+info:
+  description: This is a sample server Petstore server.  You can find out more about     Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).      For this sample, you can use the api key `special-key` to test the authorization     filters.
+  version: "1.0.0"
+  title: Swagger Petstore
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: apiteam@swagger.io
+  license:
+    name: "Apache 2.0"
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+host: petstore.swagger.io
+basePath: /v2
+tags:
+- name: inverter
+  description: Everything about your plants
+  externalDocs:
+    description: Find out more
+    url: http://swagger.io
+- name: plant
+  description: Access plant information
+- name: user
+  description: Operations about user
+  externalDocs:
+    description: Find out more about our store
+    url: http://swagger.io
+schemes:
+- https
+- http
+paths:
+  /inverter/:
+    post:
+      tags:
+      - inverter
+      summary: Add a new inverter
+      description: ""
+      operationId: addInverter
+      consumes:
+      - application/json
+      - application/xml
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - in: body
+        name: body
+        description: Inverter object that needs to be added to a plant
+        required: True
+        schema:
+          $ref: "#/definitions/Inverter"
+      responses:
+        405:
+          description: Invalid input
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+    get:
+      tags:
+      - inverter
+      summary: Get all inverters
+      description: ""
+      parameters:
+      - in: query
+        name: plantId
+        type: string
+        description: Plant Id
+        required: False
+      operationId: getInverter
+      produces:
+      - application/json
+      - application/xml
+      responses:
+        200:
+          description: successful operation
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Inverter"
+        400:
+          description: Invalid inverter name supplied
+        404:
+          description: Inverter not found
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+  /inverter/{inverterId}:
+    get:
+      tags:
+      - inverter
+      summary: Get inverter info by name
+      description: ""
+      operationId: getInverterByName
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: inverterId
+        in: path
+        type: string
+        description: Inverter object by name
+        required: True
+      responses:
+        200:
+          description: successful operation
+          schema:
+            $ref: "#/definitions/Inverter"
+        400:
+          description: Invalid inverter name supplied
+        404:
+          description: Inverter not found
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+    put:
+      tags:
+      - inverter
+      summary: Update inverter data
+      description: ""
+      operationId: updateInverter
+      produces:
+      - application/xml
+      - application/json
+      parameters:
+      - name: inverterId
+        in: path
+        description: inverter that need to be updated
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: Updated user object
+        required: true
+        schema:
+          $ref: "#/definitions/Inverter"
+      responses:
+        400:
+          description: Invalid user supplied
+        404:
+          description: User not found
+  /inverter/inverterReading:
+    post:
+      tags:
+      - inverter
+      summary: Add a new inverter readings
+      description: ""
+      operationId: addInverterReadings
+      consumes:
+      - application/json
+      - application/xml
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: inverterId
+        in: query
+        description: ID of the inverter to which we add the readings
+        required: true
+        type: integer
+        format: int64
+      - in: body
+        name: body
+        description: Pet object that needs to be added to the store
+        required: False
+        schema:
+          $ref: "#/definitions/InverterReading"
+      responses:
+        405:
+          description: Invalid input
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+    delete:
+      tags:
+      - inverter
+      summary: Delete inverter readings by date
+      description: ""
+      operationId: deleteInverterReadings
+      consumes:
+      - application/json
+      - application/xml
+      produces:
+      - application/json
+      - application/xml
+      parameters:
+      - name: inverterId
+        in: query
+        description: ID of the inverter to which we add the readings
+        required: true
+        type: integer
+        format: int64
+      - name: from
+        in: query
+        description: Delete all readings from this date on
+        required: true
+        type: string
+        format: date-time
+      - name: to
+        in: query
+        description: Delete all readings from until this date
+        required: true
+        type: string
+        format: date-time
+      responses:
+        200:
+          description: successful operation
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/InverterReading"
+        400:
+          description: Invalid ID or date supplied
+        404:
+          description: Order not found
+      security:
+      - petstore_auth:
+        - write:pets
+        - read:pets
+  /plant:
+    get:
+      tags:
+      - plant
+      summary: Returns all plants
+      description: Returns all existing plants
+      operationId: getPlants
+      produces:
+      - application/json
+      parameters:
+      - name: plantType
+        in: query
+        description: Choose type of Plant
+        type: string
+        required: False
+      responses:
+        200:
+          description: successful operation
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Plant"
+      security:
+      - api_key: []
+
+  /plant/inventory:
+    get:
+      tags:
+      - plant
+      summary: Returns all devices per plant
+      description: Returns a map of status codes to quantities
+      operationId: getInventory
+      produces:
+      - application/json
+      parameters: []
+      responses:
+        200:
+          description: successful operation
+          schema:
+            type: object
+            additionalProperties:
+              type: integer
+              format: int32
+      security:
+      - api_key: []
+
+  /user:
+    post:
+      tags:
+      - user
+      summary: Create user
+      description: This can only be done by the logged in user.
+      operationId: createUser
+      produces:
+      - application/xml
+      - application/json
+      parameters:
+      - in: body
+        name: body
+        description: Created user object
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        default:
+          description: successful operation
+  /user/createWithArray:
+    post:
+      tags:
+      - user
+      summary: Creates list of users with given input array
+      description: ""
+      operationId: createUsersWithArrayInput
+      produces:
+      - application/xml
+      - application/json
+      parameters:
+      - in: body
+        name: body
+        description: List of user object
+        required: true
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/User"
+      responses:
+        default:
+          description: successful operation
+  /user/createWithList:
+    post:
+      tags:
+      - user
+      summary: Creates list of users with given input array
+      description: ""
+      operationId: createUsersWithListInput
+      produces:
+      - application/xml
+      - application/json
+      parameters:
+      - in: body
+        name: body
+        description: List of user object
+        required: true
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/User"
+      responses:
+        default:
+          description: successful operation
+  /user/login:
+    get:
+      tags:
+      - user
+      summary: Logs user into the system
+      description: ""
+      operationId: loginUser
+      produces:
+      - application/xml
+      - application/json
+      parameters:
+      - name: username
+        in: query
+        description: The user name for login
+        required: true
+        type: string
+      - name: password
+        in: query
+        description: The password for login in clear text
+        required: true
+        type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            type: string
+          headers:
+            X-Rate-Limit:
+              type: integer
+              format: int32
+              description: calls per hour allowed by the user
+            X-Expires-After:
+              type: string
+              format: date-time
+              description: date in UTC when token expires
+        400:
+          description: Invalid username/password supplied
+  /user/logout:
+    get:
+      tags:
+      - user
+      summary: Logs out current logged in user session
+      description: ""
+      operationId: logoutUser
+      produces:
+      - application/xml
+      - application/json
+      parameters: []
+      responses:
+        default:
+          description: successful operation
+  /user/{username}:
+    get:
+      tags:
+      - user
+      summary: Get user by user name
+      description: ""
+      operationId: getUserByName
+      produces:
+      - application/xml
+      - application/json
+      parameters:
+      - name: username
+        in: path
+        description: The name that needs to be fetched. Use user1 for testing.
+        required: true
+        type: string
+      responses:
+        200:
+          description: successful operation
+          schema:
+            $ref: "#/definitions/User"
+        400:
+          description: Invalid username supplied
+        404:
+          description: User not found
+    put:
+      tags:
+      - user
+      summary: Updated user
+      description: This can only be done by the logged in user.
+      operationId: updateUser
+      produces:
+      - application/xml
+      - application/json
+      parameters:
+      - name: username
+        in: path
+        description: name that need to be updated
+        required: true
+        type: string
+      - in: body
+        name: body
+        description: Updated user object
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        400:
+          description: Invalid user supplied
+        404:
+          description: User not found
+    delete:
+      tags:
+      - user
+      summary: Delete user
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      produces:
+      - application/xml
+      - application/json
+      parameters:
+      - name: username
+        in: path
+        description: The name that needs to be deleted
+        required: true
+        type: string
+      responses:
+        400:
+          description: Invalid username supplied
+        404:
+          description: User not found
+securityDefinitions:
+  petstore_auth:
+    type: oauth2
+    authorizationUrl: http://petstore.swagger.io/oauth/dialog
+    flow: implicit
+    scopes:
+      write:pets: modify pets in your account
+      read:pets: read your pets
+  api_key:
+    type: apiKey
+    name: api_key
+    in: header
+definitions:
+  User:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      username:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      userStatus:
+        type: integer
+        format: int32
+        description: User Status
+    xml:
+      name: User
+  Plant:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+        example: Alcolea
+      location:
+        type: string
+  Inverter:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+        example: inversor1
+      ip:
+        type: string
+        example: 127.0.0.1
+      plant:
+        type: string
+        example: Alcolea
+  InverterReading:
+    type: object
+    properties:
+      time:
+        type: string
+        format: date-time
+      daily_energy_h:
+        type: integer
+        format: int64
+      daily_energy_l:
+        type: integer
+        format: int64
+  ApiResponse:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      type:
+        type: string
+      message:
+        type: string
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
